@@ -22,7 +22,7 @@ cd corsika-77100/run
 ls -R
 
 #executable, inputfile
-./${1} < Inputs/1E7/${2}
+./${1} < Inputs/1E8/${2}
 
 mv ${3} ../../../../ #move out of CMSSW build so it transfers properly
 mv ${4} ../../../../ #move out of CMSSW build so it transfers properly
