@@ -33,17 +33,24 @@ class PD_tree_reader
             px = 0;
             py = 0;
             pz = 0;
+            x_coordinate = 0;
+            y_coordinate = 0;
+            z_coordinate = 0;
+            time_since_first_interaction = 0;
 
             mother_particle_description = 0;
             mother_px = 0;
             mother_py = 0;
             mother_pz = 0;
+            mother_x_coordinate = 0;
+            mother_y_coordinate = 0;
             z_position_at_creation_point = 0;
 
             grandmother_particle_description = 0;
             grandmother_px = 0;
             grandmother_py = 0;
             grandmother_pz = 0;    
+            z_position_at_creation_point = 0;
 
         }
         
@@ -55,17 +62,24 @@ class PD_tree_reader
             PD_tree->SetBranchAddress("px",&px);
             PD_tree->SetBranchAddress("py",&py);
             PD_tree->SetBranchAddress("pz",&pz);
+            PD_tree->SetBranchAddress("x_coordinate",&x_coordinate);
+            PD_tree->SetBranchAddress("y_coordinate",&y_coordinate);
+            PD_tree->SetBranchAddress("z_coordinate",&z_coordinate);
+            PD_tree->SetBranchAddress("time_since_first_interaction",&time_since_first_interaction);
 
             PD_tree->SetBranchAddress("mother_particle_description",&mother_particle_description);
             PD_tree->SetBranchAddress("mother_px",&mother_px);
             PD_tree->SetBranchAddress("mother_py",&mother_py);
             PD_tree->SetBranchAddress("mother_pz",&mother_pz);
+            PD_tree->SetBranchAddress("mother_x_coordinate",&mother_x_coordinate);
+            PD_tree->SetBranchAddress("mother_y_coordinate",&mother_y_coordinate);
             PD_tree->SetBranchAddress("z_position_at_creation_point",&z_position_at_creation_point);
 
             PD_tree->SetBranchAddress("grandmother_particle_description",&grandmother_particle_description);
             PD_tree->SetBranchAddress("grandmother_px",&grandmother_px);
             PD_tree->SetBranchAddress("grandmother_py",&grandmother_py);
             PD_tree->SetBranchAddress("grandmother_pz",&grandmother_pz);
+            PD_tree->SetBranchAddress("z_position_at_creation_point",&z_position_at_creation_point);
             
         }
 
@@ -82,7 +96,7 @@ class PD_tree_reader
             {
                 int particle_id = (int)(particle_description->at(particle_index)/1000);
 
-                if((particle_id == 5) || particle_id == 6)
+                if((particle_id == mu_minus_id) || particle_id == mu_plus_id)
                 {
                     muon_counter++;
                 }
@@ -92,7 +106,7 @@ class PD_tree_reader
         }
         
 
-        unsigned long long int* event_number;
+        unsigned long long int event_number;
 
         //PARTICLE DATA LINE INFO
 
@@ -100,6 +114,10 @@ class PD_tree_reader
         vector<float>* px;
         vector<float>* py;
         vector<float>* pz;
+        vector<float>* x_coordinate;
+        vector<float>* y_coordinate;
+        vector<float>* z_coordinate;
+        vector<float>* time_since_first_interaction;
 
         //MOTHER PARTICLE DATA LINE INFO
 
@@ -107,6 +125,8 @@ class PD_tree_reader
         vector<float>* mother_px;
         vector<float>* mother_py;
         vector<float>* mother_pz;
+        vector<float>* mother_x_coordinate;
+        vector<float>* mother_y_coordinate;
         vector<float>* z_position_at_creation_point;
 
         //GRANDMOTHER PARTICLE DATA LINE INFO
@@ -115,6 +135,7 @@ class PD_tree_reader
         vector<float>* grandmother_px;
         vector<float>* grandmother_py;
         vector<float>* grandmother_pz;
+        vector<float>* z_position_at_interaction_point; 
 
 
 };

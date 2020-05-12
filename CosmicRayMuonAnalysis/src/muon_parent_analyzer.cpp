@@ -104,51 +104,71 @@ int muon_parent_analyzer(string input_file_path, string output_file_path, int st
         return -1;
     }
 
+    TTree* EVTH_tree = (TTree*)particle_info_file->Get("EVTH_tree");
+
+    if(!EVTH_tree)
+    {
+        cout << "Error extracting tree" << endl << endl;
+        return -1;
+    }
+
     PD_tree_reader* simulated_particle_info = new PD_tree_reader(PD_tree);
 
-    if((end_event > PD_tree->GetEntries()) || (end_event < 0))
+    if((end_event > EVTH_tree->GetEntries()) || (end_event < 0))
     {
-        end_event = PD_tree->GetEntries();
+        end_event = EVTH_tree->GetEntries();
     }   
 
-    for(int event_counter = start_event; event_counter < end_event; event_counter++)
+    cout << "Number of Events = " << (end_event - start_event) << endl << endl;
+
+    unsigned long long int total_particles = PD_tree->GetEntries();
+
+    for(unsigned long long int particle_counter = 0; particle_counter < total_particles; particle_counter++)
     {
-        if(event_counter%100 == 0)
+        if(particle_counter%1000000 == 0)
         {
-            cout << "EVENT " << event_counter << endl << endl;
+            cout << "PARTICLE " << particle_counter << endl << endl;
         }
 
-        PD_tree->GetEntry(event_counter);
+        PD_tree->GetEntry(particle_counter);
 
-        if(simulated_particle_info->particle_description->size() != simulated_particle_info->mother_particle_description->size() || simulated_particle_info->particle_description->size() != simulated_particle_info->grandmother_particle_description->size() || simulated_particle_info->mother_particle_description->size() != simulated_particle_info->grandmother_particle_description->size())
+        unsigned int particle_code;
+
+        if(simulated_particle_info->particle_description->size() > 0)
         {
-            cout << "Sizes of particle, mother, and grandmother info vectors are different" << endl << endl;
-            return -1;
+            particle_code = simulated_particle_info->particle_description->at(0);
+        }
+        else
+        {
+            continue;
+        }
+        
+        
+        if(particle_code/1000 != mu_plus_id && particle_code/1000 != mu_minus_id)
+        {
+            continue; //Not a muon
         }
 
-        for(unsigned int particle_counter = 0; particle_counter < simulated_particle_info->particle_description->size(); particle_counter++)
+        for(unsigned int mother_counter = 0; mother_counter < simulated_particle_info->mother_particle_description->size(); mother_counter++)
         {
-            if((unsigned int)simulated_particle_info->particle_description->at(particle_counter)/1000 != mu_plus_id && (unsigned int)simulated_particle_info->particle_description->at(particle_counter)/1000 != mu_minus_id)
-            {
-                continue; //Not a muon
-            }
-
-            unsigned int mother_particle_id = (-1)*simulated_particle_info->mother_particle_description->at(particle_counter)/1000;
-            unsigned int grandmother_particle_id = (-1)*simulated_particle_info->grandmother_particle_description->at(particle_counter)/1000;
-
+            unsigned int mother_particle_id = (-1)*simulated_particle_info->mother_particle_description->at(mother_counter)/1000;
             if(mother_particle_id != 0)
             {
                 mother_particle_counter[mother_particle_id]++;
                 total_mothers++;
             }
+        }
 
+        for(unsigned int grandmother_counter = 0; grandmother_counter < simulated_particle_info->grandmother_particle_description->size(); grandmother_counter++)
+        {
+            unsigned int grandmother_particle_id = (-1)*simulated_particle_info->grandmother_particle_description->at(grandmother_counter)/1000;
             if(grandmother_particle_id != 0)
             {
                 grandmother_particle_counter[grandmother_particle_id]++;
                 total_grandmothers++;
-            }          
-            
-        }
+            }  
+        }             
+        
 
     }
 

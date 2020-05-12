@@ -26,7 +26,7 @@ def write_submit_script(script_file, run_folder, input_file_path, output_file,st
     script_file.write("should_transfer_files  = YES\n")
     script_file.write("transfer_input_files   = " + (run_folder + RUN_ON_CONDOR_SCRIPT) + "," + TAR_PATH + "\n")
     script_file.write("transfer_output_files  = " + output_file + "\n")
-    script_file.write("transfer_output_remaps = \"" + output_file + " = dat/1E8/" + output_file + "\"\n")
+    script_file.write("transfer_output_remaps = \"" + output_file + " = /eos/user/s/sharipra/CORSIKA/OUTPUTS/PARTICLEINFO/1E6/" + output_file + "\"\n")
     script_file.write("whentotransferoutput   = ON_EXIT\n")
     script_file.write("getenv                 = True\n")
     script_file.write("on_exit_remove         = (ExitCode == 0)\n")
@@ -53,15 +53,12 @@ else:
     print "Could not find the bash script\n"
     exit
 
-INPUT_FILE_PATH = "/eos/user/s/sharipra/CORSIKA/OUTPUTS/PARTICLEINFO/1E8/DAT"
+INPUT_FILE_PATH = "/eos/user/s/sharipra/CORSIKA/OUTPUTS/PARTICLEINFO/1E6/DAT"
 
 files = 1000
 
 start = 0
 end = 1
-
-#missing = [88,129,242,548,853]
-
 
 for num in range(1,files+1):
 

@@ -20,7 +20,7 @@
 
 using namespace std;
 
-int corsika_output_file_processor(string input_file_path, string output_file_path)
+int corsika_output_file_processor(string input_file_path, string output_file_path, int start, int end)
 {
     cout << endl << "Reading file " << input_file_path << endl << endl;
 
@@ -42,8 +42,8 @@ int corsika_output_file_processor(string input_file_path, string output_file_pat
     TTree* RUNH_tree = new TTree("RUNH_tree","RUNH_tree");
     TTree* EVTH_tree = new TTree("EVTH_tree","EVTH_tree");
     TTree* PD_tree = new TTree("PD_tree","PD_tree");
-    
-    if(input_file_reader.process_input_file(input_file_path,RUNH_tree,EVTH_tree,PD_tree))
+      
+    if(input_file_reader.process_input_file(input_file_path,RUNH_tree,EVTH_tree,PD_tree,start,end))
     {
         cout << "Error processing file" << endl << endl;
         return -1;
@@ -62,5 +62,5 @@ int corsika_output_file_processor(string input_file_path, string output_file_pat
 
 int main(int argc, char* argv[]) //input is two strings: input filepath and output filepath
 {
-    return corsika_output_file_processor(string(argv[1]), string(argv[2]));
+    return corsika_output_file_processor(string(argv[1]), string(argv[2]), atoi(argv[3]), atoi(argv[4]));
 }

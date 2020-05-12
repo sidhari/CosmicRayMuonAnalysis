@@ -32,8 +32,14 @@ const unsigned int corsika_word_size = 4; //each word in the block structure is 
 const unsigned int block_size = 273;
 const unsigned int data_line_size = 7;
 
-unsigned int primary_energy_count = 4;
+const unsigned int input_file_count = 1000;
 
-unsigned int mu_plus_id = 5;
-unsigned int mu_minus_id = 6;
+bool multiple_files = false;
+
+const unsigned int primary_energy_count = 6;
+
+const unsigned int mu_plus_id = 5;
+const unsigned int mu_minus_id = 6;
+
+const unsigned int zeros_in_output_name = 6;
 

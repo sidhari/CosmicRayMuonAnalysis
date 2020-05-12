@@ -7,7 +7,7 @@ using namespace std;
 
 unsigned int events_per_file = 1;
 
-int steering_file_generator(string base_filepath, unsigned int total_events)
+int steering_file_generator(string base_filepath, string output_folder, unsigned int total_events)
 {
     ifstream base_file;
     base_file.open(base_filepath,ios::in);
@@ -35,7 +35,7 @@ int steering_file_generator(string base_filepath, unsigned int total_events)
         cout << "Event " << event_counter << endl << endl; 
 
         string steering_file_name = string("all-inputs_") + to_string(event_counter);
-        string steering_filepath = string("../run/Inputs/1E6/") + steering_file_name;
+        string steering_filepath = string(output_folder) + steering_file_name;
         ofstream steering_file;
         steering_file.open(steering_filepath,ios::out | ios::trunc);      
 
@@ -83,18 +83,7 @@ int steering_file_generator(string base_filepath, unsigned int total_events)
         base_file.clear(); 
         base_file.seekg (0,ios::beg);         
 
-    }
-
-    ofstream bashfile;
-    bashfile.open("../run/JobSplitter.sh",ios::out | ios::trunc);
-    string line_1 = string("#!/bin/bash");
-    bashfile << line_1 << endl;
-
-    for(unsigned int exec_counter = 1; exec_counter <= total_events; exec_counter++)
-    {
-        string line = string("./corsika77100Linux_QGSII_urqmd < Inputs/1E6/all-inputs_") + to_string(exec_counter) + string(" &");
-        bashfile << line << endl;
-    }
+    }    
 
     return 0;
 }
@@ -103,8 +92,8 @@ int main(int argc,char* argv[])
 {
     switch (argc)
     {
-    case 3:
-        return steering_file_generator(string(argv[1]),atoi(argv[2]));
+    case 4:
+        return steering_file_generator(string(argv[1]),string(argv[2]),atoi(argv[3]));
         break;
     
     default:

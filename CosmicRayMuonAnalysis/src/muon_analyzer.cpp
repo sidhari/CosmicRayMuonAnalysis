@@ -61,6 +61,33 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
         particle_info_files.push_back(particle_info_file);
     }   
 
+    vector<TTree*> event_info_trees;
+    event_info_trees.reserve(primary_energy_count);
+
+    for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
+    {
+        TTree* EVTH_tree = (TTree*)particle_info_files.at(file_counter)->Get("EVTH_tree");
+
+        if(!EVTH_tree)
+        {
+            cout << "Error opening tree" << endl << endl;
+            return -1;
+        }
+
+        event_info_trees.push_back(EVTH_tree);
+
+    }
+
+    vector<EVTH_tree_reader*> simulated_event_info_collection;
+    simulated_event_info_collection.reserve(primary_energy_count);
+
+    for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
+    {
+        TTree* EVTH_tree = event_info_trees.at(file_counter);
+        simulated_event_info_collection.push_back(new EVTH_tree_reader(EVTH_tree));
+    } 
+
+    
     vector<TTree*> particle_info_trees;
     particle_info_trees.reserve(primary_energy_count);
 
@@ -78,6 +105,7 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
 
     }
 
+    
     vector<PD_tree_reader*> simulated_particle_info_collection;
     simulated_particle_info_collection.reserve(primary_energy_count);
 
@@ -96,53 +124,90 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
     muon_counts_bins[string("muon_counts_1E2")] = 15;
     muon_counts_bins[string("muon_counts_1E3")] = 55;
     muon_counts_bins[string("muon_counts_1E4")] = 350;
+    muon_counts_bins[string("muon_counts_1E5")] = 400;
+    muon_counts_bins[string("muon_counts_1E6")] = 450;
+    //muon_counts_bins[string("muon_counts_1E7")] = 450;
+    //muon_counts_bins[string("muon_counts_1E8")] = 450;
 
     map<string,unsigned int> muon_energies_bins;
     muon_energies_bins[string("muon_energies_1E1")] = 20;
     muon_energies_bins[string("muon_energies_1E2")] = 50;
     muon_energies_bins[string("muon_energies_1E3")] = 75;
     muon_energies_bins[string("muon_energies_1E4")] = 100;
+    muon_energies_bins[string("muon_energies_1E5")] = 200;
+    muon_energies_bins[string("muon_energies_1E6")] = 300;
+    //muon_energies_bins[string("muon_energies_1E7")] = 300;
+    //muon_energies_bins[string("muon_energies_1E8")] = 300;
 
     map<string,unsigned int> muon_mothers_bins;
     muon_mothers_bins[string("muon_mothers_1E1")] = 15;
     muon_mothers_bins[string("muon_mothers_1E2")] = 20;
     muon_mothers_bins[string("muon_mothers_1E3")] = 60;
     muon_mothers_bins[string("muon_mothers_1E4")] = 60;
+    muon_mothers_bins[string("muon_mothers_1E5")] = 60;
+    muon_mothers_bins[string("muon_mothers_1E6")] = 60;
+    //muon_mothers_bins[string("muon_mothers_1E7")] = 60;
+    //muon_mothers_bins[string("muon_mothers_1E8")] = 60;
 
     map<string,unsigned int> muon_grandmothers_bins;
     muon_grandmothers_bins[string("muon_grandmothers_1E1")] = 20;
     muon_grandmothers_bins[string("muon_grandmothers_1E2")] = 30;
     muon_grandmothers_bins[string("muon_grandmothers_1E3")] = 30;
     muon_grandmothers_bins[string("muon_grandmothers_1E4")] = 30;
+    muon_grandmothers_bins[string("muon_grandmothers_1E5")] = 30;
+    muon_grandmothers_bins[string("muon_grandmothers_1E6")] = 30;
+    //muon_grandmothers_bins[string("muon_grandmothers_1E7")] = 30;
+    //muon_grandmothers_bins[string("muon_grandmothers_1E8")] = 30;
 
     map<string,unsigned int> muon_counts_range;
     muon_counts_range[string("muon_counts_1E1")] = 5;
     muon_counts_range[string("muon_counts_1E2")] = 15;
     muon_counts_range[string("muon_counts_1E3")] = 55;
     muon_counts_range[string("muon_counts_1E4")] = 350;
+    muon_counts_range[string("muon_counts_1E5")] = 3000;
+    muon_counts_range[string("muon_counts_1E6")] = 20000;
+    //muon_counts_range[string("muon_counts_1E7")] = 200000;
+    //muon_counts_range[string("muon_counts_1E8")] = 2000000;
 
     map<string,unsigned int> muon_energies_range;
     muon_energies_range[string("muon_energies_1E1")] = 5;
     muon_energies_range[string("muon_energies_1E2")] = 60;
     muon_energies_range[string("muon_energies_1E3")] = 500;
     muon_energies_range[string("muon_energies_1E4")] = 2500;
+    muon_energies_range[string("muon_energies_1E5")] = 12500;
+    muon_energies_range[string("muon_energies_1E6")] = 120000;
+    //muon_energies_range[string("muon_energies_1E7")] = 1200000;
+    //muon_energies_range[string("muon_energies_1E8")] = 12000000;
 
     map<string,unsigned int> muon_mothers_range;
     muon_mothers_range[string("muon_mothers_1E1")] = 15;
     muon_mothers_range[string("muon_mothers_1E2")] = 20;
     muon_mothers_range[string("muon_mothers_1E3")] = 60;
     muon_mothers_range[string("muon_mothers_1E4")] = 60;
+    muon_mothers_range[string("muon_mothers_1E5")] = 60;
+    muon_mothers_range[string("muon_mothers_1E6")] = 60;
+    //muon_mothers_range[string("muon_mothers_1E7")] = 60;
+    //muon_mothers_range[string("muon_mothers_1E8")] = 60;
 
     map<string,unsigned int> muon_grandmothers_range;
     muon_grandmothers_range[string("muon_grandmothers_1E1")] = 20;
     muon_grandmothers_range[string("muon_grandmothers_1E2")] = 30;
     muon_grandmothers_range[string("muon_grandmothers_1E3")] = 30;
     muon_grandmothers_range[string("muon_grandmothers_1E4")] = 30;
+    muon_grandmothers_range[string("muon_grandmothers_1E5")] = 30;
+    muon_grandmothers_range[string("muon_grandmothers_1E6")] = 30;
+    //muon_grandmothers_range[string("muon_grandmothers_1E7")] = 30;
+    //muon_grandmothers_range[string("muon_grandmothers_1E8")] = 30;
 
     //MUON COUNTS
 
     vector<TH1F*> muon_counts;
     muon_counts.reserve(primary_energy_count);
+
+    //MUON COUNT VS PRIMARY COS(THETA)
+
+    vector<TH1F*> muon_counts_vs_primary_cos_theta;
+    muon_counts_vs_primary_cos_theta.reserve(primary_energy_count);
 
     //MUON ENERGIES
 
@@ -159,6 +224,11 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
     vector<TH1F*> muon_grandmothers;
     muon_grandmothers.reserve(primary_energy_count);
 
+    //MUONS COS(THETA)
+
+    vector<TH1F*> muon_cos_theta;
+    muon_cos_theta.reserve(primary_energy_count);
+
     for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
     {   
         //MUON COUNTS
@@ -166,6 +236,11 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
         string muon_counts_hist_name = string("muon_counts_1E") + to_string(file_counter+1);
         muon_counts.push_back(new TH1F(muon_counts_hist_name.c_str(),"Muon Counts at Detector Level;Muon Count;Event Count",muon_counts_bins[muon_counts_hist_name],0,muon_counts_range[muon_counts_hist_name]));
 
+        //MUON COUNT VS PRIMARY COS(THETA)
+
+        string muon_counts_vs_primary_cos_theta_hist_name = string("muon_counts_vs_primary_cos_theta_1E") + to_string(file_counter+1);
+        muon_counts_vs_primary_cos_theta.push_back(new TH1F(muon_counts_vs_primary_cos_theta_hist_name.c_str(),"Muon Counts at Detector Level vs cos(theta) of Primary;cos(theta) of primary [theta in radians];Muon Count",50,-1,1));
+        
         //MUON ENERGIES
 
         string muon_energies_hist_name = string("muon_energies_1E") + to_string(file_counter+1);
@@ -180,76 +255,134 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
 
         string muon_grandmothers_hist_name = string("muon_grandmothers_1E") + to_string(file_counter+1);
         muon_grandmothers.push_back(new TH1F(muon_grandmothers_hist_name.c_str(),"Grandmother Particle Codes;Particle Code;Count",muon_grandmothers_bins[muon_grandmothers_hist_name],0,muon_grandmothers_range[muon_grandmothers_hist_name]));
+
+        //MUONS COS(THETA)
+
+        string(muon_cos_theta_hist_name) = string("muon_cos_theta_1E") + to_string(file_counter+1);
+        muon_cos_theta.push_back(new TH1F(muon_cos_theta_hist_name.c_str(),"cos(theta) of muons;cos(theta) [theta in radians];Muon Count",50,-1,1));
     }  
 
 
-    if((end_event > particle_info_trees.at(0)->GetEntries()) || (end_event < 0))
+    if((end_event > event_info_trees.at(0)->GetEntries()) || (end_event < 0))
     {
-        end_event = particle_info_trees.at(0)->GetEntries();
-    }       
+        end_event = event_info_trees.at(0)->GetEntries();
+    }
 
-    cout << "Starting event number: " << start_event + 1 << " Ending event number: " << end_event << endl << endl;
+    cout << "Number of events per file = " << (end_event - start_event) << endl << endl;    
+    //cout << "Starting event number: " << start_event + 1 << " Ending event number: " << end_event << endl << endl;
 
     vector<float> global_muon_counts;
     vector<float> average_muon_counts;
     vector<float> muon_energies_sum;
     vector<float> average_muon_energy;
 
+    vector<unsigned long long int> event_counter;
+    
     for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
     {
         global_muon_counts.push_back(0);
         average_muon_counts.push_back(0);
         muon_energies_sum.push_back(0);
         average_muon_energy.push_back(0);
+
+        particle_info_trees.at(file_counter)->GetEntry(0);
+        event_counter.push_back((unsigned long long int)simulated_particle_info_collection.at(file_counter)->event_number); 
+
     }
+            
+    for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
+    {   
+        unsigned long long int total_particles = particle_info_trees.at(file_counter)->GetEntries();
+        unsigned int muon_count = 0;
+        float muon_x;
+        float muon_y;
+        float muon_z;
 
-    for(int event_counter = start_event; event_counter < end_event; event_counter++)
-    {  
-        if(event_counter%100 == 0)
-        {
-            cout << "EVENT: " << event_counter << endl << endl; 
-        } 
+        cout << "Processing File " << file_counter + 1 << endl << endl;
 
-        for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
-        {
-            particle_info_trees.at(file_counter)->GetEntry(event_counter);
-                   
-            if(simulated_particle_info_collection.at(file_counter)->particle_description->size() != simulated_particle_info_collection.at(file_counter)->mother_particle_description->size() || simulated_particle_info_collection.at(file_counter)->particle_description->size() != simulated_particle_info_collection.at(file_counter)->grandmother_particle_description->size() || simulated_particle_info_collection.at(file_counter)->mother_particle_description->size() != simulated_particle_info_collection.at(file_counter)->grandmother_particle_description->size())
+        for(unsigned long long int particle_counter = 0; particle_counter < total_particles; particle_counter++)
+        {           
+
+            particle_info_trees.at(file_counter)->GetEntry(particle_counter); 
+
+            //unsigned long long int* this_event_number_ptr = simulated_particle_info_collection.at(file_counter)->event_number;           
+            
+            unsigned long long int this_event_number = simulated_particle_info_collection.at(file_counter)->event_number;
+
+            unsigned int particle_code;
+
+            if(simulated_particle_info_collection.at(file_counter)->particle_description->size() > 0)
             {
-                cout << "Sizes of particle, mother, and grandmother info vectors are different" << endl << endl;
-                return -1;
+                particle_code = simulated_particle_info_collection.at(file_counter)->particle_description->at(0);                   
             }
-
-            unsigned int muon_count = simulated_particle_info_collection.at(file_counter)->muon_count_in_event();
-            muon_counts.at(file_counter)->Fill(muon_count);
-            global_muon_counts.at(file_counter)+=muon_count;
-
-            for(unsigned int particle_counter = 0; particle_counter < simulated_particle_info_collection.at(file_counter)->particle_description->size(); particle_counter++)
+            else
             {
-                if((unsigned int)simulated_particle_info_collection.at(file_counter)->particle_description->at(particle_counter)/1000 != mu_plus_id && (unsigned int)simulated_particle_info_collection.at(file_counter)->particle_description->at(particle_counter)/1000 != mu_minus_id) //not a muon
-                {
-                    continue; 
-                }
+                continue;
+            }
+            
 
-                float px = simulated_particle_info_collection.at(file_counter)->px->at(particle_counter);
-                float py = simulated_particle_info_collection.at(file_counter)->py->at(particle_counter);
-                float pz = simulated_particle_info_collection.at(file_counter)->pz->at(particle_counter);
+            if(particle_code/1000 != mu_plus_id && particle_code/1000 != mu_minus_id) //not a muon
+            {
+                continue; 
+            }     
+
+            muon_x = simulated_particle_info_collection.at(file_counter)->x_coordinate->at(0);
+            muon_y = simulated_particle_info_collection.at(file_counter)->y_coordinate->at(0);                 
+            muon_z = simulated_particle_info_collection.at(file_counter)->z_coordinate->at(0); 
+
+            global_muon_counts.at(file_counter)++;
+
+            if(this_event_number == event_counter.at(file_counter))
+            {
+                muon_count++;                
+            }
+            else
+            {
+                muon_counts.at(file_counter)->Fill(muon_count);
+                muon_count = 0;
+                event_counter.at(file_counter) = this_event_number;
+                muon_count++;
+            }    
+            
+            event_info_trees.at(file_counter)->GetEntry(this_event_number);
+            float primary_cos_theta = cos(simulated_event_info_collection.at(file_counter)->theta);            
+            muon_counts_vs_primary_cos_theta.at(file_counter)->Fill(primary_cos_theta);  
+
+            float cos_theta = (muon_z)/(sqrt(pow(muon_x,2) + pow(muon_y,2) + pow(muon_z,2)));
+            muon_cos_theta.at(file_counter)->Fill(cos_theta);  
+
+            for(unsigned int muon_counter = 0; muon_counter < simulated_particle_info_collection.at(file_counter)->particle_description->size(); muon_counter++)
+            {
+                float px = simulated_particle_info_collection.at(file_counter)->px->at(muon_counter);
+                float py = simulated_particle_info_collection.at(file_counter)->py->at(muon_counter);
+                float pz = simulated_particle_info_collection.at(file_counter)->pz->at(muon_counter);
 
                 float muon_energy = sqrt(pow(px,2) + pow(py,2) + pow(pz,2));
                 muon_energies.at(file_counter)->Fill(muon_energy);
                 muon_energies_sum.at(file_counter) += muon_energy;
+            }           
 
-                int mother_particle_id = (-1)*(int)simulated_particle_info_collection.at(file_counter)->mother_particle_description->at(particle_counter)/1000;
-                int grandmother_particle_id = (-1)*(int)simulated_particle_info_collection.at(file_counter)->grandmother_particle_description->at(particle_counter)/1000;
-
+            for(unsigned int mother_counter = 0; mother_counter < simulated_particle_info_collection.at(file_counter)->mother_particle_description->size(); mother_counter++)
+            {
+                int mother_particle_id = (-1)*(int)simulated_particle_info_collection.at(file_counter)->mother_particle_description->at(mother_counter)/1000;
                 muon_mothers.at(file_counter)->Fill(mother_particle_id);
-                muon_grandmothers.at(file_counter)->Fill(grandmother_particle_id);
+            }    
 
+            for(unsigned int grandmother_counter = 0; grandmother_counter < simulated_particle_info_collection.at(file_counter)->grandmother_particle_description->size(); grandmother_counter++)
+            {
+                int grandmother_particle_id = (-1)*(int)simulated_particle_info_collection.at(file_counter)->grandmother_particle_description->at(grandmother_counter)/1000;
+                muon_grandmothers.at(file_counter)->Fill(grandmother_particle_id);
             }
 
-        }          
+        }       
 
-    }
+        muon_counts.at(file_counter)->Fill(muon_count); //muons from last event
+
+        cout << "Finished File" << file_counter + 1 << endl << endl;     
+
+    }          
+
+    
 
     for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
     {
@@ -257,13 +390,13 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
         average_muon_energy.at(file_counter) = muon_energies_sum.at(file_counter)/global_muon_counts.at(file_counter);
     }
 
-    float primary_energy_temp[] = {10,100,1000,10000}; //Deal with these later
+    float primary_energy_temp[] = {10,100,1000,10000,100000,1000000}; //Deal with these later
     float averages_temp[primary_energy_count];
     float average_energy_temp[primary_energy_count];
 
-    float average_muon_counts_errors_x[] = {0,0,0,0}; 
+    float average_muon_counts_errors_x[] = {0,0,0,0,0,0}; 
     float average_muon_counts_errors_y[primary_energy_count];
-    float average_energy_errors_x[] = {0,0,0,0}; 
+    float average_energy_errors_x[] = {0,0,0,0,0,0}; 
     float average_energy_errors_y[primary_energy_count];
 
     for(unsigned file_counter = 0; file_counter < primary_energy_count; file_counter++)
@@ -290,7 +423,9 @@ int muon_analyzer(string input_file_path, string output_file_path, int start_eve
     for(unsigned int file_counter = 0; file_counter < primary_energy_count; file_counter++)
     {
         muon_counts.at(file_counter)->Write();
+        muon_counts_vs_primary_cos_theta.at(file_counter)->Write();
         muon_energies.at(file_counter)->Write();
+        muon_cos_theta.at(file_counter)->Write();
         muon_mothers.at(file_counter)->Write();
         muon_grandmothers.at(file_counter)->Write();
     }
