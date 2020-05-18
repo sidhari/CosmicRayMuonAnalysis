@@ -25,12 +25,12 @@ using namespace std;
 class run_header_sub_block_branches //branches filled here contain run information, filled once per RUNH
 {
     public:
-        unsigned int run_number;
-        unsigned int date_of_begin_run; //for the sake of documentation
-        float energy_spectrum_slope;
-        float energy_range_low;
-        float energy_range_high;
-        unsigned int nshow; //number of showers to be generated
+        vector<unsigned int> run_number;
+        vector<unsigned int> date_of_begin_run; //for the sake of documentation
+        vector<float> energy_spectrum_slope;
+        vector<float> energy_range_low;
+        vector<float> energy_range_high;
+        vector<unsigned int> nshow; //number of showers to be generated
         
         run_header_sub_block_branches(TTree *t)
         {   
@@ -42,20 +42,21 @@ class run_header_sub_block_branches //branches filled here contain run informati
             t->Branch("nshow",&nshow);
         }  
 
+        void clear_vectors();
 
 };
 
 class event_header_sub_block_branches //branches filled here contaain event information, filled once per EVTH
 {
     public:
-        unsigned long long int event_number;
-        float primary_id; //currently using protons (id = 14)
-        float primary_energy; //in GEV
-        float primary_px;
-        float primary_py;
-        float primary_pz; //downwards is positive
-        float theta; //zenith angle in radians
-        float phi; //azimuthal angle in radians
+        vector<unsigned long long int> event_number;
+        vector<float> primary_id; //currently using protons (id = 14)
+        vector<float> primary_energy; //in GEV
+        vector<float> primary_px;
+        vector<float> primary_py;
+        vector<float> primary_pz; //downwards is positive
+        vector<float> theta; //zenith angle in radians
+        vector<float> phi; //azimuthal angle in radians
 
         event_header_sub_block_branches(TTree *t)
         {
@@ -68,6 +69,8 @@ class event_header_sub_block_branches //branches filled here contaain event info
             t->Branch("theta",&theta);
             t->Branch("phi",&phi);
         } 
+
+        void clear_vectors();
         
 };
 
@@ -75,9 +78,8 @@ class data_sub_block_branches
 {
     public:
 
-        unsigned long long int event_number; 
+        vector<unsigned long long int> event_number; 
         
-
         //PARTICLE DATA LINE INFO
 
         vector<float> particle_description;
@@ -91,20 +93,10 @@ class data_sub_block_branches
 
         //MOTHER PARTICLE DATA LINE INFO
 
-        vector<float> mother_particle_description;
-        vector<float> mother_px;
-        vector<float> mother_py;
-        vector<float> mother_pz;
-        vector<float> mother_x_coordinate;
-        vector<float> mother_y_coordinate;
         vector<float> z_position_at_creation_point;
 
         //GRANDMOTHER PARTICLE DATA LINE INFO
-
-        vector<float> grandmother_particle_description;
-        vector<float> grandmother_px;
-        vector<float> grandmother_py;
-        vector<float> grandmother_pz;      
+         
         vector<float> z_position_at_interaction_point;        
 
        data_sub_block_branches(TTree *t)
@@ -119,19 +111,9 @@ class data_sub_block_branches
             t->Branch("y_coordinate",&y_coordinate);
             t->Branch("z_coordinate",&z_coordinate);
             t->Branch("time_since_first_interaction",&time_since_first_interaction);
-
-            t->Branch("mother_particle_description",&mother_particle_description);
-            t->Branch("mother_px",&mother_px);
-            t->Branch("mother_py",&mother_py);
-            t->Branch("mother_pz",&mother_pz);
-            t->Branch("mother_x_coordinate",&mother_x_coordinate);
-            t->Branch("mother_y_coordinate",&mother_y_coordinate);
+            
             t->Branch("z_position_at_creation_point",&z_position_at_creation_point);
-
-            t->Branch("grandmother_particle_description",&grandmother_particle_description);
-            t->Branch("grandmother_px",&grandmother_px);
-            t->Branch("grandmother_py",&grandmother_py);
-            t->Branch("grandmother_pz",&grandmother_pz);
+            
             t->Branch("z_position_at_interaction_point",&z_position_at_interaction_point);
 
         }    
@@ -145,8 +127,8 @@ class corsika_output_file_reader
 {
     public:
 
-        int process_run_header_sub_block(vector<float> run_header_sub_block,TTree* RUNH_tree,run_header_sub_block_branches RUNH_sub_block_branches); //writes necesssary info from sub_block to ROOT tree
-        int process_event_header_sub_block(vector<float> event_header_sub_block,TTree* EVTH_tree,event_header_sub_block_branches EVTH_sub_block_branches); //writes necesssary info from sub_block to ROOT tree
+        int process_run_header_sub_block(vector<float> run_header_sub_block,TTree* RUNH_tree,run_header_sub_block_branches* RUNH_sub_block_branches); //writes necesssary info from sub_block to ROOT tree
+        int process_event_header_sub_block(vector<float> event_header_sub_block,TTree* EVTH_tree,event_header_sub_block_branches* EVTH_sub_block_branches); //writes necesssary info from sub_block to ROOT tree
         
         bool is_particle_data_line(float particle_id);
         bool is_mother_particle_data_line(float particle_id,float z_position);

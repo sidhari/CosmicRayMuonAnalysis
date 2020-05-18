@@ -9,7 +9,7 @@ PROJLIBS=$(LIBDIR)/corsika_output_file_to_ROOT_cpp.so
 
 
 # Assume it contains a main() function from https://gist.github.com/ghl3/3975167
-all: $(PROJLIBS) $(SRCDIR)/corsika_output_file_processor $(SRCDIR)/muon_analyzer $(SRCDIR)/steering_file_generator
+all: $(PROJLIBS) $(SRCDIR)/corsika_output_file_processor $(SRCDIR)/muon_analyzer $(SRCDIR)/steering_file_generator $(SRCDIR)/check_file_exists $(SRCDIR)/muon_parent_analyzer
 
 
 

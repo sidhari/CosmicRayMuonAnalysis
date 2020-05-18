@@ -113,62 +113,63 @@ int muon_parent_analyzer(string input_file_path, string output_file_path, int st
     }
 
     PD_tree_reader* simulated_particle_info = new PD_tree_reader(PD_tree);
+    EVTH_tree_reader* simulated_event_info = new EVTH_tree_reader(EVTH_tree);
 
-    if((end_event > EVTH_tree->GetEntries()) || (end_event < 0))
-    {
-        end_event = EVTH_tree->GetEntries();
-    }   
+    end_event = PD_tree->GetEntries();    
 
     cout << "Number of Events = " << (end_event - start_event) << endl << endl;
 
-    unsigned long long int total_particles = PD_tree->GetEntries();
-
-    for(unsigned long long int particle_counter = 0; particle_counter < total_particles; particle_counter++)
+    for(unsigned int event_counter = (unsigned int)start_event; event_counter < (unsigned int)end_event ; event_counter++)
     {
-        if(particle_counter%1000000 == 0)
+        if(event_counter%100 == 0)
         {
-            cout << "PARTICLE " << particle_counter << endl << endl;
+            cout << "EVENT " << event_counter << endl << endl;
         }
 
-        PD_tree->GetEntry(particle_counter);
+        PD_tree->GetEntry(event_counter);
 
-        unsigned int particle_code;
-
-        if(simulated_particle_info->particle_description->size() > 0)
+        for(unsigned int particle_counter = 0; particle_counter < simulated_particle_info->particle_description->size(); )
         {
-            particle_code = simulated_particle_info->particle_description->at(0);
-        }
-        else
-        {
-            continue;
-        }
-        
-        
-        if(particle_code/1000 != mu_plus_id && particle_code/1000 != mu_minus_id)
-        {
-            continue; //Not a muon
-        }
-
-        for(unsigned int mother_counter = 0; mother_counter < simulated_particle_info->mother_particle_description->size(); mother_counter++)
-        {
-            unsigned int mother_particle_id = (-1)*simulated_particle_info->mother_particle_description->at(mother_counter)/1000;
-            if(mother_particle_id != 0)
+            if((int)simulated_particle_info->particle_description->at(particle_counter)/1000 != 75 && (int)simulated_particle_info->particle_description->at(particle_counter)/1000 != 76)
             {
-                mother_particle_counter[mother_particle_id]++;
-                total_mothers++;
+                particle_counter++;
+                continue;
+            } 
+
+            particle_counter++;
+
+            unsigned int mother_line_counter = 0;
+
+            for(unsigned int mother_counter = particle_counter; simulated_particle_info->z_position_at_creation_point->at(mother_counter) > 0; mother_counter++)
+            {
+                unsigned int mother_particle_id = (-1)*simulated_particle_info->particle_description->at(mother_counter)/1000;
+                if(mother_particle_id != 0)
+                {
+                    mother_particle_counter[mother_particle_id]++;
+                    total_mothers++;
+                }
+                mother_line_counter++;
             }
-        }
 
-        for(unsigned int grandmother_counter = 0; grandmother_counter < simulated_particle_info->grandmother_particle_description->size(); grandmother_counter++)
-        {
-            unsigned int grandmother_particle_id = (-1)*simulated_particle_info->grandmother_particle_description->at(grandmother_counter)/1000;
-            if(grandmother_particle_id != 0)
+            particle_counter += mother_line_counter;
+
+            unsigned int grandmother_line_counter = 0;
+
+            for(unsigned int grandmother_counter = particle_counter; simulated_particle_info->particle_description->at(grandmother_counter) < 0; grandmother_counter++)
             {
-                grandmother_particle_counter[grandmother_particle_id]++;
-                total_grandmothers++;
-            }  
-        }             
-        
+                unsigned int grandmother_particle_id = (-1)*simulated_particle_info->particle_description->at(grandmother_counter)/1000;
+                if(grandmother_particle_id != 0)
+                {
+                    grandmother_particle_counter[grandmother_particle_id]++;
+                    total_grandmothers++;
+                }
+                grandmother_line_counter++;
+            }
+
+            particle_counter += grandmother_line_counter;            
+
+            
+        }        
 
     }
 
@@ -188,25 +189,22 @@ int muon_parent_analyzer(string input_file_path, string output_file_path, int st
     sort(mother_particle_counter_vec.begin(),mother_particle_counter_vec.end(),sortByVal);
     sort(grandmother_particle_counter_vec.begin(),grandmother_particle_counter_vec.end(),sortByVal);
 
-    //unsigned int mother_particle_counter_size = mother_particle_counter.size();
-    //unsigned int grandmother_particle_counter_size = grandmother_particle_counter.size();
-
     map<unsigned int,string> mother_labels;
-    mother_labels[5] = string("Other");
+    mother_labels[6] = string("Other");
 
     map<unsigned int,string> grandmother_labels;
-    grandmother_labels[5] = string("Other");
+    grandmother_labels[6] = string("Other");
 
-    float mother_pie_vals[6];
-    mother_pie_vals[5] = 0;
+    float mother_pie_vals[7];
+    mother_pie_vals[6] = 0;
 
-    float grandmother_pie_vals[6];
-    grandmother_pie_vals[5] = 0;
+    float grandmother_pie_vals[7];
+    grandmother_pie_vals[6] = 0;
 
     int mother_entry_number = 0;
     int grandmother_entry_number = 0;
 
-    int color[] = {2,3,4,5,6,7};
+    int color[] = {2,3,4,5,6,7,8};
 
     for(unsigned int vec_index = 0; vec_index < mother_particle_counter_vec.size(); vec_index++)
     {
@@ -220,9 +218,9 @@ int muon_parent_analyzer(string input_file_path, string output_file_path, int st
         }
         else
         {
-            if(mother_entry_number >= 5)
+            if(mother_entry_number >= 6)
             {
-                mother_pie_vals[5] += mother_particle_counter_vec.at(vec_index).second;
+                mother_pie_vals[6] += mother_particle_counter_vec.at(vec_index).second;
                 continue;
             }
             else
@@ -249,9 +247,9 @@ int muon_parent_analyzer(string input_file_path, string output_file_path, int st
         }
         else
         {
-            if(grandmother_entry_number >= 5)
+            if(grandmother_entry_number >= 6)
             {
-                grandmother_pie_vals[5] += grandmother_particle_counter_vec.at(vec_index).second;
+                grandmother_pie_vals[6] += grandmother_particle_counter_vec.at(vec_index).second;
                 continue;
             }
             else
@@ -265,65 +263,6 @@ int muon_parent_analyzer(string input_file_path, string output_file_path, int st
         }
         
     }
-
-    /*mother_particle_counter_it = mother_particle_counter.begin();    
-
-    grandmother_particle_counter_it = grandmother_particle_counter.begin();    
-
-    while(mother_particle_counter_it != mother_particle_counter.end())
-    {           
-        unsigned int particle_id = mother_particle_counter_it->first;
-        if(mother_particle_counter_it->second < total_mothers/100)
-        {
-            mother_pie_vals[0] += mother_particle_counter_it->second;
-            mother_particle_counter_it++;
-            continue;
-        }
-
-        PID_to_name_it = PID_to_name.find(particle_id);
-        if(PID_to_name_it == PID_to_name.end())
-        {
-            mother_pie_vals[1] += mother_particle_counter_it->second;
-            mother_particle_counter_it++;
-            continue;
-        }
-        else
-        {
-            mother_labels[mother_entry_number] = string(PID_to_name_it->second);
-            mother_pie_vals[mother_entry_number] = mother_particle_counter_it->second;
-            mother_entry_number++;
-            mother_particle_counter_it++;
-            continue;
-        }
-                
-    }
-    
-    while(grandmother_particle_counter_it != grandmother_particle_counter.end())
-    {        
-        unsigned int particle_id = grandmother_particle_counter_it->first;
-        if(grandmother_particle_counter_it->second < total_grandmothers/100)
-        {
-            grandmother_pie_vals[0] += grandmother_particle_counter_it->second;
-            grandmother_particle_counter_it++;
-            continue;
-        }
-
-        PID_to_name_it = PID_to_name.find(particle_id);
-        if(PID_to_name_it == PID_to_name.end())
-        {
-            grandmother_pie_vals[1] += grandmother_particle_counter_it->second;
-            grandmother_particle_counter_it++;
-            continue;
-        }
-        else
-        {
-            grandmother_labels[grandmother_entry_number] = string(PID_to_name_it->second);
-            grandmother_pie_vals[grandmother_entry_number] = grandmother_particle_counter_it->second;
-            grandmother_entry_number++;
-            grandmother_particle_counter_it++;
-            continue;
-        }
-    }*/
 
     int mother_nvals = sizeof(mother_pie_vals)/sizeof(mother_pie_vals[0]);
     int grandmother_nvals = sizeof(grandmother_pie_vals)/sizeof(grandmother_pie_vals[0]);

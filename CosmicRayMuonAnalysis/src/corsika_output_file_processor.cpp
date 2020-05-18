@@ -22,8 +22,6 @@ using namespace std;
 
 int corsika_output_file_processor(string input_file_path, string output_file_path, int start, int end)
 {
-    cout << endl << "Reading file " << input_file_path << endl << endl;
-
     corsika_output_file_reader input_file_reader;
 
     /*if(input_file_reader.is_valid(string(input_file_path.c_str())) == false)

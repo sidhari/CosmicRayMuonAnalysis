@@ -36,7 +36,7 @@ const unsigned int input_file_count = 1000;
 
 bool multiple_files = false;
 
-const unsigned int primary_energy_count = 6;
+const unsigned int primary_energy_count = 5;
 
 const unsigned int mu_plus_id = 5;
 const unsigned int mu_minus_id = 6;
